@@ -29,8 +29,8 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <% Datosusuario.forEach(usuario => { %>
-                            <div class="small mb-1">Tienda: <%= usuario.nombre + ' ' + usuario.apellidos%></div>
+                        <% Datosusuario.forEach(Dusuario => { %>
+                            <div class="small mb-1">Tienda: <%= Dusuario.nombre + ' ' + Dusuario.apellidos%></div>
                         <% }) %>
                         <h1 class="display-5 fw-bolder"><%= producto.productName %></h1>
                         <div class="fs-5 mb-5">
@@ -49,9 +49,12 @@
                         </div>
 
                         <!-- Botón de mensaje con redirección -->
-                        <button class="btn btn-primary rounded-circle shadow" type="button" style="width: 45px; height: 45px;" onclick="window.location.href='/chats/<%= usuario._id %>'">
-                            <i class="bi-chat-dots"></i>
-                        </button>
+                        <% Datosusuario.forEach(Dusuario => { %>
+                            <button class="btn btn-primary rounded-circle shadow" type="button" style="width: 45px; height: 45px;" onclick="window.location.href='/chats/<%= Dusuario._id %>'">
+                                <i class="bi-chat-dots"></i>
+                            </button>
+                        <% }) %>
+                        
 
                     </div>
                 </div>
