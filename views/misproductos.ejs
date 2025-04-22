@@ -1,0 +1,125 @@
+<% if(Session) { %>
+    <%- include ('barras/top') %>
+
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+
+        <!-- Page Heading -->
+        <header class="bg-primary text-white py-5 mb-4">
+            <div class="container px-4 px-lg-5 text-center">
+                <h1 class="display-4 fw-bolder">Mis Productos</h1>
+                <p class="lead fw-normal text-white-50">Gestiona y administra tus productos de manera sencilla</p>
+            </div>
+        </header>
+
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <a href="/nuevo-producto" class="d-none d-sm-inline-block btn btn-lg btn-success shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Agregar Producto
+            </a>
+        </div>
+
+        <!-- Section: Mis Productos -->
+        <section class="py-5">
+            <div class="container px-4 px-lg-5 mt-5">
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                    <% if (productos.length === 0) { %>
+                        <div class="col-12 text-center">
+                          <p>No se ha publicado ningún producto.</p>
+                        </div>
+                      <% } else { %>
+                        <% productos.forEach(productos => { %>
+                          <div class="col mb-5">
+                            <div class="card h-100">
+                              <a href="/shopitem/<%= productos._id %>" class="text-black">
+                                <img class="card-img-top" src="/<%= productos.productImages[0] %>" alt="<%= productos.productName %>" style="object-fit: cover; width: 100%; height: 160px;">
+                                <div class="card-body p-4">
+                                  <div class="text-center">
+                                    <h5 class="fw-bolder text-truncate"><%= productos.productName %></h5>
+                                    <% let precioFormateado = productos.productPrice.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }); %>
+                                                <%= precioFormateado %>
+                                  </div>
+                                </div>
+                              </a>
+                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                  <div class="text-center">
+                                    <a class="btn btn-outline-dark mt-auto" href="/productedit/<%= productos._id %>">Editar</a>
+                                    <!-- <a class="btn btn-danger mt-auto" href="#">Eliminar</a> -->
+                                    <!-- Botón para abrir el modal -->
+                                    <a href="#" class="btn btn-danger mt-auto btn-icon-split delete-btn" 
+                                      data-bs-toggle="modal" 
+                                      data-bs-target="#confirmDeleteModal" 
+                                      data-id="<%= productos._id %>"
+                                      data-nombre="<%= productos.productName %>">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-trash"></i>
+                                        </span>
+                                        <span class="text">Quitar</span>
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        <% }); %>
+                      <% } %>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Modal de Confirmación (ÚNICO modal en la página) -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  ¿Estás seguro de que deseas eliminar <strong id="modalProductName"></strong>? Esta acción no se puede deshacer.
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+
+<!-- /.container-fluid -->
+    <%- include ('barras/under') %>      
+<% } else { %>  
+
+    <%- include ('barras/noregistrado') %>  
+
+<% } %>  
+    <!-- Script para manejar la actualización del modal y eliminación -->
+<script>
+  let productIdToDelete = null;
+
+  document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', function () {
+          productIdToDelete = this.getAttribute('data-id');
+          document.getElementById('modalProductName').textContent = this.getAttribute('data-nombre');
+      });
+  });
+
+  document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+      if (!productIdToDelete) return;
+
+            fetch(`/productdelete/${productIdToDelete}`, {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.message) {
+              alert(data.message);
+              window.location.reload();
+          }
+      })
+      .catch(error => console.error("Error:", error));
+  });
+</script>

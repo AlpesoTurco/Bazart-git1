@@ -1,0 +1,114 @@
+<% if(Session) { %>
+    <%- include ('barras/top') %>
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+        <link rel="stylesheet" href="/resources/style/style.css">
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid" onload="scrollToBottom()">
+                <div class="container-fluid chat-container">
+                    
+                    <div class="chat-box">
+                        <div class="messages d-flex flex-column" id="chat-messages">
+                            <div class="message received pendejo">This html snippet was created to help web designers, web developers, front-end and back-end developer save time. Use it for free in your project and build your app faster, You can also download the HTML, CSS, and JS code.</div>
+                            <% mensajes.forEach(msg => { %>
+                                <% if(msg.senderId.toString() === usuario._id.toString()) { %>
+                                    <div class="message sent"><%= msg.message %></div>
+                                <% } else { %>
+                                    <div class="message received"><%= msg.message %></div>
+                                <% } %>
+                            <% }); %>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="receiverId" value="<%= contacto %>" hidden>
+                            <input type="text" id="messageInput" class="form-control" placeholder="Escribe tu mensaje...">
+                            <button class="btn btn-primary" onclick="sendMessage()">Enviar</button>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                <script>
+                    function scrollToBottom() {
+                        var chatMessages = document.getElementById("chat-messages");
+                        setTimeout(() => {
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }, 100);
+                    }
+                
+                    window.onload = scrollToBottom;
+                </script>
+                <script>
+                    function sendMessage() {
+                    const receiverId = document.getElementById("receiverId").value;
+                    const message = document.getElementById("messageInput").value;
+
+                    if (!message.trim()) {
+                        alert("El mensaje no puede estar vacío");
+                        return;
+                    }
+
+                    fetch('/enviar-mensaje', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ receiverId, message })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.alert) {
+                            alert(data.alertMessage);
+                            document.getElementById("messageInput").value = "";
+                        }
+                    })
+                    .catch(error => console.error("Error enviando mensaje:", error));
+                }
+
+                </script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io(); // Conectar con el servidor
+
+    // Obtener elementos del chat
+    const chatMessages = document.getElementById("chat-messages");
+    const messageInput = document.getElementById("messageInput");
+    const receiverId = document.getElementById("receiverId").value; // ID del receptor
+
+    function sendMessage() {
+        const message = messageInput.value.trim();
+        if (message === "") return;
+
+        const senderId = "<%= usuario._id %>"; // ID del usuario autenticado
+
+        // Enviar mensaje a través de WebSocket
+        socket.emit('sendMessage', { senderId, receiverId, message });
+
+        messageInput.value = ""; // Limpiar input
+    }
+
+    // Recibir mensajes en tiempo real
+    socket.on('receiveMessage', (msg) => {
+        const isMine = msg.senderId === "<%= usuario._id %>";
+        const messageClass = isMine ? "message sent" : "message received";
+
+        chatMessages.innerHTML += `<div class="${messageClass}">${msg.message}</div>`;
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll al final
+    });
+</script>
+
+                
+
+            </div>
+
+        </div>
+<!-- /.container-fluid -->
+
+    <%- include ('barras/under') %>      
+<% } else { %>  
+
+    <%- include ('barras/noregistrado') %>  
+
+<% } %>  

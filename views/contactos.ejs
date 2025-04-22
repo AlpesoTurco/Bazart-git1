@@ -1,0 +1,63 @@
+<%- include ('barras/top') %>
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="container-fluid chat-container">
+        <div class="contacts p-3">
+            <h5 class="mb-3 text-primary fw-bold">Contactos</h5>
+
+            <% if (contactos.length === 0) { %>
+                <div class="alert alert-info text-center">
+                    No tienes mensajes con ningún contacto todavía.
+                </div>
+            <% } else { %>
+                <ul class="list-group">
+                    <% contactos.forEach(contacto => { %>
+                        <li class="list-group-item contact-item">
+                            <a href="/chats/<%= contacto._id %>" class="d-flex align-items-center contact-link">
+                                <i class="bi bi-person-circle text-white me-3 fs-4"></i>
+                                <span><%= contacto.nombre %> <%= contacto.apellidos %></span>
+                            </a>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } %>
+
+        </div>
+    </div>
+</div>
+
+
+<%- include ('barras/under') %>
+
+<style>
+    .contact-item {
+        background: linear-gradient(135deg, #1565c0, #1e88e5); /* Degradado azul */
+        border-radius: 10px;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    
+    .contact-item:hover {
+        transform: scale(1.02);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .contact-link {
+        text-decoration: none;
+        color: white;
+        font-weight: 500;
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .contact-link:hover {
+        color: #e3f2fd;
+    }
+
+    .list-group-item {
+        border: none;
+    }
+</style>

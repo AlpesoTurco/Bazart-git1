@@ -1,0 +1,126 @@
+<% if(Session) { %>
+    <%- include ('barras/top') %>
+
+    <!-- Begin Page Content -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Sección de productos -->
+            <div class="col-md-8">
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center">Cantidad</th>
+                                <th class="text-center">Precio</th>
+                                <th class="text-center">Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (carritoFrond && carritoFrond.items.length > 0) { %>
+                                <% carritoFrond.items.forEach(item => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="<%= item.productoId.productImages[0] || 'https://via.placeholder.com/72' %>" class="me-3" alt="Producto" style="width: 80px; height: 80px; object-fit: cover;">
+                                                <div>
+                                                    <h5><a href="#"><%= item.productoId.productName %></a></h5>
+                                                    <p class="text-muted mb-0">Marca: <a href="#"><%= item.productoId.productBrand || 'Desconocida' %></a></p>
+                                                    <span class="text-success"><strong>En stock</strong></span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="form-control w-50 mx-auto"><%= item.cantidad %></span>
+                                        </td>                                        
+                                        <td class="text-center">
+                                            <% if (item.productoId && item.productoId.productPrice !== undefined) { %>
+                                                <strong>$<%= item.productoId.productPrice.toFixed(2) %></strong>
+                                            <% } else { %>
+                                                <strong>No disponible</strong>
+                                            <% } %>
+                                        </td>
+                                        <td class="text-center">
+                                            <% if (item.productoId && item.productoId.productPrice !== undefined) { %>
+                                                <strong>$<%= (item.productoId.productPrice * item.cantidad).toFixed(2) %></strong>
+                                            <% } else { %>
+                                                <strong>No disponible</strong>
+                                            <% } %>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-danger" onclick="eliminarProducto('<%= item.productoId._id %>')">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="5" class="text-center">No hay productos en tu carrito.</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sección de resumen y pago -->
+            <div class="col-md-4">
+                <div class="bg-light p-4 rounded shadow">
+                    <h4 class="text-center">Resumen del Pedido</h4>
+                    <hr>
+                    <% let subtotal = 0; %>
+                    <% if (carritoFrond && carritoFrond.items.length > 0) { %>
+                        <% carritoFrond.items.forEach(item => { 
+                            if (item.productoId && item.productoId.productPrice !== undefined) {
+                                subtotal += item.productoId.productPrice * item.cantidad;
+                            }
+                        }); %>
+                    <% } %>
+                    <p><strong>Subtotal:</strong> $<%= subtotal.toFixed(2) %></p>
+                    <p><strong>Envío estimado:</strong> $6.94</p>
+                    <h4><strong>Total: $<%= (subtotal +     6.94).toFixed(2) %></strong></h4>
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="/" class="btn btn-secondary">
+                            <i class="fas fa-shopping-cart"></i> Seguir comprando
+                        </a>                        
+                        <button class="btn btn-success">
+                            Finalizar compra <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function eliminarProducto(productId) {
+            fetch('/eliminar-del-carrito', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.alert) {
+                    alert(data.alertMessage); 
+                    window.location.reload();   
+                } else {
+                    alert("Hubo un problema al eliminar el producto");
+                }
+            })
+            .catch(error => {
+                alert("Error al eliminar el producto menso" + error);
+                console.log('Error al eliminar el producto:', error);
+                alert("Error al eliminar el producto menso" + error);
+            });
+        }
+    </script>
+    
+    <%- include ('barras/under') %>      
+<% } else { %>  
+    <%- include ('barras/noregistrado') %>  
+<% } %>

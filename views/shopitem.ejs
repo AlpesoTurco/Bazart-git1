@@ -1,0 +1,142 @@
+<% if(Session) { %>
+    <%- include ('barras/top') %>
+    
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+
+        <!-- Product section-->
+        <% producto.forEach(producto => { %>
+        <section class="py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="row gx-4 gx-lg-5 align-items-center">
+                    <div class="col-md-6">
+                        <div id="carouselExampleFade" class="carousel slide carousel-fade">
+                            <div class="carousel-inner">
+                                <% for (let i = 0; i < producto.productImages.length; i++) { %>
+                                    <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                                    <img src="/<%= producto.productImages[i] %>" class="d-block w-100" alt="Imagen del producto">
+                                    </div>
+                                <% } %>
+                            </div>
+                            <button class="carousel-control-prev text-warning" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <% Datosusuario.forEach(usuario => { %>
+                            <div class="small mb-1">Tienda: <%= usuario.nombre + ' ' + usuario.apellidos%></div>
+                        <% }) %>
+                        <h1 class="display-5 fw-bolder"><%= producto.productName %></h1>
+                        <div class="fs-5 mb-5">
+                            <span class="text-decoration-line-through">$45.00</span>
+                            <span><% let precioFormateado = producto.productPrice.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }); %>
+                                <%= precioFormateado %></span>
+                        </div>
+                        <p class="lead"><%= producto.productDescription %></p>
+                        <!-- Agregar al carrito -->
+                        <div class="d-flex mb-3">
+                            <input class="form-control text-center me-3" id="inputQuantity" type="number" value="1" style="max-width: 3rem" />
+                            <button class="btn btn-outline-dark flex-shrink-0 me-2" type="button" data-id="<%= producto._id %>">
+                                <i class="bi-cart-fill me-1"></i>
+                                Agregar Al Carrito
+                            </button>
+                        </div>
+
+                        <!-- Botón de mensaje con redirección -->
+                        <button class="btn btn-primary rounded-circle shadow" type="button" style="width: 45px; height: 45px;" onclick="window.location.href='/chats/<%= usuario._id %>'">
+                            <i class="bi-chat-dots"></i>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="container my-4">
+            <h5 class="fw-bold">Especificaciones del producto</h5>
+            <ul class="list-unstyled">
+                <li><strong>Marca:</strong> <%= producto.productBrand %></li>
+                <li><strong>Modelo:</strong> <%= producto.productModel %></li>
+                <li><strong>Color:</strong> <%= producto.productColor %></li>
+                <li><strong>Tamaño:</strong> <%= producto.productSize %></li>
+            </ul>
+        </div>
+
+        <!-- Sección de Comentarios -->
+        <div class="container my-5 border-top">
+            <h5 class="fw-bold mb-4">Comentarios</h5>
+
+            <!-- Formulario para agregar comentario -->
+            <form action="#" method="post" class="mb-5">
+                <div class="mb-3">
+                    <label for="comentario" class="form-label">Tu Comentario</label>
+                    <textarea class="form-control" id="comentario" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar Comentario</button>
+            </form>
+
+            <!-- Lista de comentarios -->
+            <div class="comments-list">
+                <div class="card mb-3 shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="card-title mb-1 fw-semibold">Juan Pérez</h6>
+                        <p class="card-text mb-0">Excelente producto, superó mis expectativas.</p>
+                    </div>
+                </div>
+                <div class="card mb-3 shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="card-title mb-1 fw-semibold">Maria López</h6>
+                        <p class="card-text mb-0">Muy bueno, pero me gustaría que viniera en más colores.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <% }) %>
+        <!-- Related items section-->
+        <section class="py-5 bg-light">
+            <div class="container px-4 px-lg-5 mt-5">
+                <h2 class="fw-bolder mb-4">Productos Relacionados</h2>
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                    <!-- Vista 1   -->
+                    <% relacionados.sort(() => Math.random() - 0.5).slice(0, 4).forEach(relad => { %>
+                        <div class="col mb-5">
+                            <div class="card h-100">
+                                <!-- Product image-->
+                                <a href="/shopitem/<%= relad._id %>" class="text-black">
+                                    <img class="card-img-top" src="/<%= relad.productImages[0] %>" alt="<%= relad.productName %>" style="object-fit: cover; width: 100%; height: 160px;">
+                                    <div class="card-body p-4">
+                                      <div class="text-center">
+                                        <h5 class="fw-bolder text-truncate"><%= relad.productName %></h5>
+                                        $<%= relad.productPrice %>
+                                      </div>
+                                    </div>
+                                  </a>
+                                <!-- Product actions-->
+                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                    <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="/shopitem/<%= relad._id %>">Revisar</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    <!-- /.container-fluid -->
+
+    <%- include ('barras/under') %>      
+
+<% } else { %>  
+    
+    <%- include ('barras/noregistrado') %>  
+
+<% } %>  

@@ -1,0 +1,115 @@
+<% if(Session) { %>
+    <%- include ('barras/top') %>
+
+    <body class="bg-gradient-primary">
+        <div class="container">
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">Agregar un Nuevo Producto</h1>
+                                </div>
+                                <form class="user" id="productForm" action="/agregar-producto" method="post" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user" id="productName" name="productName" placeholder="Nombre del Producto" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <textarea class="form-control form-control-user" id="productDescription" name="productDescription" placeholder="Descripción del Producto" rows="3" required></textarea>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-6 mb-3 mb-sm-0">
+                                            <input type="number" class="form-control form-control-user" id="productPrice" name="productPrice" placeholder="Precio" required>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <input type="number" class="form-control form-control-user" id="productStock" name="productStock" placeholder="Cantidad en Stock" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user" id="productCategory" name="productCategory" placeholder="Categoría del Producto" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productImages" class="font-weight-bold text-primary">Imágenes del Producto</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="productImages" name="productImages" multiple required>
+                                            <label class="custom-file-label" for="productImages" data-browse="Subir">
+                                                <span class="text-muted">Selecciona una o más imágenes...</span>
+                                            </label>
+                                        </div>
+                                        <small class="form-text text-muted">Formatos admitidos: JPEG, PNG, GIF. Máx. 5MB por imagen.</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user" id="productTags" name="productTags" placeholder="Etiquetas (separadas por comas)">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user" id="productBrand" name="productBrand" placeholder="Marca del Producto">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user" id="productModel" name="productModel" placeholder="Modelo del Producto">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user" id="productColor" name="productColor" placeholder="Color del Producto">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control form-control-user" id="productSize" name="productSize" placeholder="Tamaño del Producto">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-user btn-block">
+                                        Agregar Producto
+                                    </button>
+                                    <hr>
+                                </form>
+                                <div class="text-center mt-3">
+                                    <a class="small" href="/">Volver al Inicio</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+      <script src="resources/recursos/vendor/jquery/jquery.min.js"></script>
+      <script src="resources/recursos/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+      <script src="resources/recursos/vendor/jquery-easing/jquery.easing.min.js"></script>
+      <script src="resources/recursos/js/sb-admin-2.min.js"></script>
+      <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <%if (typeof alert != "undefined") { %>
+        <script>
+            Swal.fire({
+                title: '<%= alertTitle %>',
+                text: '<%= alertMessage %>',
+                icon: '<%= alertIcon %>',
+                showConfirmButton: '<% showConfirmButton %>', 
+                timer: '<%= timer %>' 
+            }).then(() => {
+                window.location = '/<%= ruta %>';
+            });
+        </script>
+    <% } %>
+
+
+
+      <script>
+        document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+            var files = document.getElementById("productImages").files;  // Corregido aquí
+            var fileNames = [];
+            for (var i = 0; i < files.length; i++) {
+                fileNames.push(files[i].name);
+            }
+            var nextSibling = e.target.nextElementSibling;
+            nextSibling.innerText = fileNames.join(", ") || "Selecciona una o más imágenes...";
+        });
+    </script>
+
+
+    <%- include ('barras/under') %>      
+<% } else { %>  
+
+    <%- include ('barras/noregistrado') %>  
+
+<% } %>  
+    
+    
