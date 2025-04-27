@@ -1,7 +1,7 @@
 <% if(Session) { %>
     <%- include ('barras/top') %>
     
-    <!-- Begin Page Content -->
+    <!-- Begin Page Content -->     
     <div class="container-fluid">
 
         <!-- Product section-->
@@ -42,7 +42,7 @@
                         <!-- Agregar al carrito -->
                         <div class="d-flex mb-3">
                             <input class="form-control text-center me-3" id="inputQuantity" type="number" value="1" style="max-width: 3rem" />
-                            <button class="btn btn-outline-dark flex-shrink-0 me-2" type="button" data-id="<%= producto._id %>">
+                            <button class="btn btn-outline-dark flex-shrink-0 me-2 btn-agregar-carrito" type="button" data-id="<%= producto._id %>">
                                 <i class="bi-cart-fill me-1"></i>
                                 Agregar Al Carrito
                             </button>
@@ -75,30 +75,35 @@
         <div class="container my-5 border-top">
             <h5 class="fw-bold mb-4">Comentarios</h5>
 
-            <!-- Formulario para agregar comentario -->
-            <form action="#" method="post" class="mb-5">
+            <form id="formComentario" class="mb-5">
                 <div class="mb-3">
-                    <label for="comentario" class="form-label">Tu Comentario</label>
-                    <textarea class="form-control" id="comentario" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
+                    <label for="comentarioTexto" class="form-label">Tu Comentario</label>
+                    <textarea class="form-control" id="comentarioTexto" name="comentarioTexto" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
                 </div>
+                <input type="hidden" id="productoId" name="productoId" value="<%= producto._id %>">
                 <button type="submit" class="btn btn-primary">Enviar Comentario</button>
             </form>
+            
+            <p>Id del que está haciendo el comentario: <%= usuario._id %></p>
+            <p>Id del producto: <%= producto._id %></p>
+            
+
 
             <!-- Lista de comentarios -->
-            <div class="comments-list">
-                <div class="card mb-3 shadow-sm border-0">
-                    <div class="card-body">
-                        <h6 class="card-title mb-1 fw-semibold">Juan Pérez</h6>
-                        <p class="card-text mb-0">Excelente producto, superó mis expectativas.</p>
-                    </div>
-                </div>
-                <div class="card mb-3 shadow-sm border-0">
-                    <div class="card-body">
-                        <h6 class="card-title mb-1 fw-semibold">Maria López</h6>
-                        <p class="card-text mb-0">Muy bueno, pero me gustaría que viniera en más colores.</p>
-                    </div>
-                </div>
+            <!-- Lista de comentarios -->
+<div class="comments-list">
+    <% comentarios.forEach(comentario => { %>
+        <div class="card mb-3 shadow-sm border-0">
+            <div class="card-body">
+                <!-- Mostrar nombre del usuario que hizo el comentario -->
+                <h6 class="card-title mb-1 fw-semibold"><%= comentario.usuarioId.nombre %></h6>
+                <!-- Mostrar el texto del comentario -->
+                <p class="card-text mb-0"><%= comentario.comentarioTexto %></p>
             </div>
+        </div>
+    <% }) %>
+</div>
+
         </div>
 
 
@@ -136,7 +141,89 @@
     </div>
     <!-- /.container-fluid -->
 
-    <%- include ('barras/under') %>      
+    <script>
+        document.getElementById('formComentario').addEventListener('submit', async function (e) {
+            e.preventDefault();
+    
+            const comentarioTexto = document.getElementById('comentarioTexto').value;
+            const productoId = document.getElementById('productoId').value;
+    
+            if (!comentarioTexto.trim()) {
+                alert("El comentario no puede estar vacío.");
+                return;
+            }
+    
+            try {
+                const res = await fetch('/agregar-comentario', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ comentarioTexto, productoId })
+                });
+    
+                const data = await res.json();
+    
+                if (res.ok) {
+                    alert("Comentario agregado correctamente");
+                    document.getElementById('formComentario').reset();
+                    // Aquí puedes refrescar comentarios si quieres
+                } else {
+                    alert(data.message || "Error al enviar comentario");
+                }
+            } catch (error) {
+                console.error("Error en el envío:", error);
+                alert("Error del servidor");
+            }
+        });
+    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const botonAgregar = document.querySelector('.btn-agregar-carrito');
+    
+            botonAgregar.addEventListener('click', async () => {
+                const productId = botonAgregar.getAttribute('data-id');
+                const quantity = document.getElementById('inputQuantity').value;
+    
+                try {
+                    const response = await fetch('/agregar-al-carrito', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId, quantity })
+                    });
+    
+                    const result = await response.json();
+    
+                        if (result.alert) {
+                        Swal.fire({
+                            title: result.alertTitle,
+                            text: result.alertMessage,
+                            icon: result.alertIcon,
+                            showConfirmButton: result.showConfirmButton,
+                            timer: result.timer
+                        }).then(() => {
+                            window.location = '/' + result.ruta;
+                        });
+                    } else {
+                        alert(result.message);
+                    }
+    
+                } catch (error) {
+                    console.error('Error agregando al carrito:', error);
+                }
+            });
+        });
+    </script>
+    
+     
+
+    <%- include ('barras/under') %>    
+      
 
 <% } else { %>  
     

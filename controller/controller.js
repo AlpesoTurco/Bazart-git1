@@ -4,9 +4,18 @@ const Usuario = require('../models/usuarios');
 const Producto = require('../models/newproduct');
 const Carrito = require('../models/carrito');
 const Chat = require('../models/chats');
+const Comentario = require('../models/Comentario');
+const Pedido = require('../models/Pedido');
 const bcrypt = require('bcryptjs');
+// Para pdf
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
 
 const mongoose = require('mongoose');
+
+
+
 
 
 
@@ -336,13 +345,15 @@ controller.get('/shopitem/:producto', async (req, res) => {
     try {
         const producto = await Producto.find({ _id: idproducto });
         const usuario = await Usuario.find({_id: producto[0].usuarioid});
+        const comentarios = await Comentario.find({ productoId: idproducto }).populate('usuarioId', 'nombre');
         const productosRelacionados = await Producto.find({});
         res.render('shopitem', {
             Session: true, 
             usuario: req.session.user,
             producto: producto,
             relacionados: productosRelacionados,
-            Datosusuario: usuario
+            Datosusuario: usuario,
+            comentarios: comentarios
         });
 
     } catch (error) {
@@ -350,6 +361,46 @@ controller.get('/shopitem/:producto', async (req, res) => {
         res.status(500).send("Error al cargar productos");
     }
 });
+
+controller.post('/agregar-comentario', async (req, res) => {
+    try {
+        if (!req.session?.user?._id) {
+            return res.status(401).json({ message: "Debes iniciar sesión para comentar" });
+        }
+
+        const usuarioId = new mongoose.Types.ObjectId(req.session.user._id);
+        const { productoId, comentarioTexto } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(productoId)) {
+            return res.status(400).json({ message: "ID de producto inválido" });
+        }
+
+        if (!comentarioTexto || comentarioTexto.trim() === "") {
+            return res.status(400).json({ message: "El comentario no puede estar vacío" });
+        }
+
+        const nuevoComentario = new Comentario({
+            productoId,
+            usuarioId,
+            comentarioTexto,
+            fecha: new Date()
+        });
+
+        await nuevoComentario.save();
+
+        res.status(201).json({
+            message: "Comentario agregado correctamente",
+            comentario: nuevoComentario
+        });
+
+    } catch (error) {
+        console.error("Error al agregar comentario:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+});
+
+
+
 
 controller.use('/', require('./newproduct.js'));
 controller.use('/', require('./carrito.js'));

@@ -30,8 +30,8 @@ carrito.post('/agregar-al-carrito', async (req, res) => {
 
         // Buscar y actualizar o insertar en el carrito
         const carrito = await Carrito.findOneAndUpdate(
-            { usuarioId, "items.productoId": productId }, // Busca si el usuario ya tiene el producto en su carrito
-            { $inc: { "items.$.cantidad": quantity } }, // Si lo encuentra, incrementa la cantidad
+            { usuarioId, "items.productoId": productId }, 
+            { $inc: { "items.$.cantidad": quantity } }, 
             { new: true }
         );
 
@@ -111,7 +111,7 @@ carrito.post('/eliminar-del-carrito', async (req, res) => {
             message: "Producto eliminado del carrito",
             carrito,
             alert: true,
-            alertTitle: "🛒 Producto eliminado",
+            alertTitle: "🗑️ Producto eliminado",
             alertMessage: "Se ha eliminado el producto del carrito correctamente",
             alertIcon: "success",
             showConfirmButton: false,
